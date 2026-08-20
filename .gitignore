@@ -1,0 +1,39 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+dist/
+build/
+.venv/
+
+# Secrets and local configuration (safe examples remain allowed)
+.env
+.env.*
+!.env.example
+!.env.*.example
+.streamlit/secrets.toml
+
+# Runtime data and generated artifacts
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+reports/
+uploads/
+artifacts/
+var/
+
+# Office and local binary inputs are deny-by-default for the MVP
+*.xlsx
+*.xls
+*.docx
+
+# OS and editor files
+.DS_Store
+.idea/
+.vscode/

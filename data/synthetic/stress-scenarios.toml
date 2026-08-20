@@ -1,0 +1,23 @@
+scenario_set_id = "market-risk-lab-synthetic-stress"
+version = "1.0.0"
+
+[[scenarios]]
+scenario_id = "broad_risk_contraction"
+version = "1.0.0"
+description = "Fictional cross-asset contraction with a stronger euro."
+asset_class_shocks = { equity = -0.18, government_bond = 0.035, corporate_credit = -0.07, commodity = -0.11 }
+currency_shocks = { USD = -0.04, GBP = -0.03 }
+
+[[scenarios]]
+scenario_id = "inflation_pressure"
+version = "1.0.0"
+description = "Fictional inflation shock with bond losses and commodity gains."
+asset_class_shocks = { equity = -0.09, government_bond = -0.12, corporate_credit = -0.08, commodity = 0.18, cash = 0.005 }
+currency_shocks = { USD = 0.06, GBP = 0.03 }
+
+[[scenarios]]
+scenario_id = "euro_repricing"
+version = "1.0.0"
+description = "Fictional euro appreciation with modest local risky-asset gains."
+asset_class_shocks = { equity = 0.055, corporate_credit = 0.025, commodity = 0.03 }
+currency_shocks = { USD = -0.10, GBP = -0.07 }

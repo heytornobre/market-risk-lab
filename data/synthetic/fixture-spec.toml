@@ -1,0 +1,258 @@
+specification_version = "1.0.0"
+seed = 20260815
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+base_currency = "EUR"
+start_date = "2021-01-04"
+end_date = "2025-12-31"
+position_date = "2025-12-31"
+trading_days_per_year = 252
+allow_short_positions = false
+factors = ["commodities", "credit", "currency", "global_equity", "rates"]
+
+[[instruments]]
+instrument_id = "LAB_CASH_EUR"
+display_name = "Orchid EUR Liquidity"
+asset_class = "cash"
+quote_currency = "EUR"
+price_multiplier = 1.0
+factor_classification = "cash"
+initial_price = 100.0
+annual_return = 0.018
+annual_volatility = 0.004
+factor_loadings = { rates = -0.10 }
+
+[[instruments]]
+instrument_id = "LAB_COM_ENERGY_USD"
+display_name = "Ember Synthetic Energy Basket"
+asset_class = "commodity"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "energy"
+initial_price = 73.0
+annual_return = 0.045
+annual_volatility = 0.28
+factor_loadings = { commodities = 0.82, global_equity = 0.20, currency = 0.10 }
+
+[[instruments]]
+instrument_id = "LAB_COM_METALS_USD"
+display_name = "Quartz Synthetic Metals Basket"
+asset_class = "commodity"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "metals"
+initial_price = 118.0
+annual_return = 0.035
+annual_volatility = 0.19
+factor_loadings = { commodities = 0.72, rates = -0.20, currency = 0.12 }
+
+[[instruments]]
+instrument_id = "LAB_CR_EUR"
+display_name = "Juniper Euro Credit"
+asset_class = "corporate_credit"
+quote_currency = "EUR"
+price_multiplier = 1.0
+factor_classification = "euro_credit"
+initial_price = 101.0
+annual_return = 0.034
+annual_volatility = 0.065
+factor_loadings = { credit = 0.68, rates = -0.36, global_equity = 0.18 }
+
+[[instruments]]
+instrument_id = "LAB_CR_USD"
+display_name = "Lantern Dollar Credit"
+asset_class = "corporate_credit"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "dollar_credit"
+initial_price = 96.0
+annual_return = 0.041
+annual_volatility = 0.08
+factor_loadings = { credit = 0.70, rates = -0.30, global_equity = 0.20, currency = 0.10 }
+
+[[instruments]]
+instrument_id = "LAB_EQ_EUR_A"
+display_name = "Aster Continental Equity"
+asset_class = "equity"
+quote_currency = "EUR"
+price_multiplier = 1.0
+factor_classification = "developed_europe"
+initial_price = 84.0
+annual_return = 0.072
+annual_volatility = 0.19
+factor_loadings = { global_equity = 0.78, credit = 0.12, rates = -0.12 }
+
+[[instruments]]
+instrument_id = "LAB_EQ_EUR_B"
+display_name = "Cobalt Continental Equity"
+asset_class = "equity"
+quote_currency = "EUR"
+price_multiplier = 1.0
+factor_classification = "developed_europe"
+initial_price = 132.0
+annual_return = 0.066
+annual_volatility = 0.17
+factor_loadings = { global_equity = 0.72, credit = 0.18, rates = -0.08 }
+
+[[instruments]]
+instrument_id = "LAB_EQ_GBP"
+display_name = "Harbor Sterling Equity"
+asset_class = "equity"
+quote_currency = "GBP"
+price_multiplier = 1.0
+factor_classification = "developed_uk"
+initial_price = 57.0
+annual_return = 0.061
+annual_volatility = 0.18
+factor_loadings = { global_equity = 0.74, currency = 0.18, rates = -0.08 }
+
+[[instruments]]
+instrument_id = "LAB_EQ_USD_A"
+display_name = "Nimbus Dollar Equity"
+asset_class = "equity"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "developed_us"
+initial_price = 146.0
+annual_return = 0.082
+annual_volatility = 0.21
+factor_loadings = { global_equity = 0.80, currency = 0.15, rates = -0.10 }
+
+[[instruments]]
+instrument_id = "LAB_EQ_USD_B"
+display_name = "Pioneer Dollar Equity"
+asset_class = "equity"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "developed_us"
+initial_price = 91.0
+annual_return = 0.076
+annual_volatility = 0.23
+factor_loadings = { global_equity = 0.76, currency = 0.20, credit = 0.10 }
+
+[[instruments]]
+instrument_id = "LAB_GOV_EUR"
+display_name = "Willow Euro Sovereign"
+asset_class = "government_bond"
+quote_currency = "EUR"
+price_multiplier = 1.0
+factor_classification = "euro_government"
+initial_price = 104.0
+annual_return = 0.026
+annual_volatility = 0.055
+factor_loadings = { rates = -0.72, credit = 0.08 }
+
+[[instruments]]
+instrument_id = "LAB_GOV_GBP"
+display_name = "Yarrow Sterling Sovereign"
+asset_class = "government_bond"
+quote_currency = "GBP"
+price_multiplier = 1.0
+factor_classification = "sterling_government"
+initial_price = 109.0
+annual_return = 0.029
+annual_volatility = 0.07
+factor_loadings = { rates = -0.68, currency = 0.16, credit = 0.08 }
+
+[[instruments]]
+instrument_id = "LAB_GOV_USD"
+display_name = "Zephyr Dollar Sovereign"
+asset_class = "government_bond"
+quote_currency = "USD"
+price_multiplier = 1.0
+factor_classification = "dollar_government"
+initial_price = 98.0
+annual_return = 0.031
+annual_volatility = 0.065
+factor_loadings = { rates = -0.70, currency = 0.18, credit = 0.06 }
+
+[[fx_series]]
+quote_currency = "GBP"
+initial_rate = 1.17
+annual_return = -0.002
+annual_volatility = 0.075
+factor_loadings = { currency = 0.78, global_equity = 0.10, rates = -0.08 }
+
+[[fx_series]]
+quote_currency = "USD"
+initial_rate = 0.92
+annual_return = -0.004
+annual_volatility = 0.085
+factor_loadings = { currency = -0.82, global_equity = -0.08, rates = 0.08 }
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_CASH_EUR"
+quantity = 137.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_COM_ENERGY_USD"
+quantity = 223.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_COM_METALS_USD"
+quantity = 311.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_CR_EUR"
+quantity = 419.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_CR_USD"
+quantity = 521.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_EQ_EUR_A"
+quantity = 617.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_EQ_EUR_B"
+quantity = 719.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_EQ_GBP"
+quantity = 823.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_EQ_USD_A"
+quantity = 929.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_EQ_USD_B"
+quantity = 1031.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_GOV_EUR"
+quantity = 1123.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_GOV_GBP"
+quantity = 1229.0
+
+[[positions]]
+portfolio_id = "SYNTHETIC_LAB_PORTFOLIO"
+effective_date = "2025-12-31"
+instrument_id = "LAB_GOV_USD"
+quantity = 1301.0

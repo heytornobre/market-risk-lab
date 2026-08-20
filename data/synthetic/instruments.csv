@@ -1,0 +1,14 @@
+instrument_id,display_name,asset_class,quote_currency,price_multiplier,factor_classification
+LAB_CASH_EUR,Orchid EUR Liquidity,cash,EUR,1.0000000000,cash
+LAB_COM_ENERGY_USD,Ember Synthetic Energy Basket,commodity,USD,1.0000000000,energy
+LAB_COM_METALS_USD,Quartz Synthetic Metals Basket,commodity,USD,1.0000000000,metals
+LAB_CR_EUR,Juniper Euro Credit,corporate_credit,EUR,1.0000000000,euro_credit
+LAB_CR_USD,Lantern Dollar Credit,corporate_credit,USD,1.0000000000,dollar_credit
+LAB_EQ_EUR_A,Aster Continental Equity,equity,EUR,1.0000000000,developed_europe
+LAB_EQ_EUR_B,Cobalt Continental Equity,equity,EUR,1.0000000000,developed_europe
+LAB_EQ_GBP,Harbor Sterling Equity,equity,GBP,1.0000000000,developed_uk
+LAB_EQ_USD_A,Nimbus Dollar Equity,equity,USD,1.0000000000,developed_us
+LAB_EQ_USD_B,Pioneer Dollar Equity,equity,USD,1.0000000000,developed_us
+LAB_GOV_EUR,Willow Euro Sovereign,government_bond,EUR,1.0000000000,euro_government
+LAB_GOV_GBP,Yarrow Sterling Sovereign,government_bond,GBP,1.0000000000,sterling_government
+LAB_GOV_USD,Zephyr Dollar Sovereign,government_bond,USD,1.0000000000,dollar_government
