@@ -12,7 +12,10 @@ IMMUTABLE_ACTION = re.compile(r"^[^@\s]+@[0-9a-f]{40}$")
 def test_workflow_is_minimal_read_only_and_immutably_pinned() -> None:
     text = WORKFLOW.read_text(encoding="utf-8")
     workflow = yaml.safe_load(text)
-    assert workflow["permissions"] == {"contents": "read"}
+    assert workflow["permissions"] == {
+        "contents": "read",
+        "pull-requests": "read",
+    }
     assert set(workflow[True]) == {"push", "pull_request"}
     assert "schedule" not in workflow[True]
     assert workflow["concurrency"]["cancel-in-progress"] is True
