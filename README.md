@@ -127,13 +127,13 @@ run lifecycle, provenance model, and deferred scope.
 The branch-enabled suite covers calculations, FX conversion, validation, transactions,
 run failures, deterministic replay, dashboard read-only behavior, CLI integration, scanner
 false positives/negatives, workflow policy, and package boundaries. The enforced threshold
-is 80% combined coverage; the verified baseline is 84.51% statement, 65.17% branch, and
-81.06% combined coverage.
+is 80% combined branch-aware coverage. The current suite contains 99 tests and its verified
+combined coverage is 81.70%.
 
-The future GitHub Actions workflow has read-only contents permission, immutable action
-pins, no deployment or schedule, and no artifact retention. Its configuration is locally
-verified, but no badge is shown because the repository and first live workflow run are not
-yet authorised.
+GitHub Actions runs the same quality and release-safety gates on pushes and pull requests
+to `main`. The workflow has read-only `contents` and `pull-requests` permissions, immutable
+action pins, no deployment or schedule, and no artifact retention. Live Gitleaks and the
+complete Linux x86-64 quality gate have passed on both pull-request and `main` workflows.
 
 Run the complete local gate:
 
