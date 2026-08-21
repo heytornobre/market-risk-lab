@@ -96,7 +96,11 @@ def generate_demo(
         hashes = generate_fixtures(spec, output_directory)
         typer.echo(
             json.dumps(
-                {"specification_version": spec.specification_version, "files": hashes},
+                {
+                    "specification_version": spec.specification_version,
+                    "generator_version": spec.generator_version,
+                    "files": hashes,
+                },
                 sort_keys=True,
             )
         )

@@ -29,6 +29,9 @@ def test_complete_generate_migrate_load_inspect_flow(
     )
     assert result.exit_code == 0, result.output
     assert (generated / "fixture-spec.toml").exists()
+    generation = json.loads(result.stdout)
+    assert generation["specification_version"] == "1.1.0"
+    assert generation["generator_version"] == "fixed-order-cholesky-v1"
 
     result = runner.invoke(app, ["db", "migrate", "--database", str(database)])
     assert result.exit_code == 0, result.output
@@ -41,10 +44,32 @@ def test_complete_generate_migrate_load_inspect_flow(
         )
         assert result.exit_code == 0, result.output
 
+    missing_scenario = tmp_path / "missing-scenarios.toml"
+    result = runner.invoke(
+        app,
+        [
+            "risk",
+            "run",
+            "--database",
+            str(database),
+            "--scenario-set",
+            str(missing_scenario),
+            "--confidence-levels",
+            "0.95",
+            "--horizons",
+            "1",
+            "--mc-simulations",
+            "1000",
+        ],
+    )
+    assert result.exit_code == 1
+    assert str(tmp_path) not in result.stderr
+    assert "invalid stress scenario set <local-path>/missing-scenarios.toml" in result.stderr
+
     result = runner.invoke(app, ["demo", "inspect", "--database", str(database)])
     assert result.exit_code == 0, result.output
     summary = json.loads(result.stdout)
-    assert summary["fixture_version"] == "1.0.0"
+    assert summary["fixture_version"] == "1.1.0"
     assert summary["counts"]["instruments"] == 13
     assert summary["counts"]["positions"] == 13
     assert summary["currencies"] == ["EUR", "GBP", "USD"]

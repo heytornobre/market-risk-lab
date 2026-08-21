@@ -14,6 +14,8 @@ import pandas as pd
 from market_risk_engine.domain.models import Currency, FixtureSpec
 
 CSV_FLOAT_FORMAT = ".10f"
+GENERATOR_VERSION = "fixed-order-cholesky-v1"
+CORRELATION_TOLERANCE = 1e-12
 
 
 def build_correlation_matrix(spec: FixtureSpec) -> tuple[list[str], np.ndarray]:
@@ -29,22 +31,78 @@ def build_correlation_matrix(spec: FixtureSpec) -> tuple[list[str], np.ndarray]:
         [[values.get(factor, 0.0) for factor in factors] for values in series_loadings],
         dtype=np.float64,
     )
-    residual_variance = 1.0 - np.square(loadings).sum(axis=1)
+    residual_variance = np.array(
+        [1.0 - math.fsum(float(value) ** 2 for value in row) for row in loadings],
+        dtype=np.float64,
+    )
     if np.any(residual_variance <= 0):
         raise ValueError("factor loadings leave no positive idiosyncratic variance")
-    correlation = loadings @ loadings.T + np.diag(residual_variance)
-    correlation = (correlation + correlation.T) / 2.0
-    if np.linalg.eigvalsh(correlation).min() < -1e-12:
-        raise ValueError("constructed correlation matrix is not positive semidefinite")
+    correlation = np.empty((len(loadings), len(loadings)), dtype=np.float64)
+    for row in range(len(loadings)):
+        for column in range(len(loadings)):
+            correlation[row, column] = math.fsum(
+                float(left) * float(right)
+                for left, right in zip(loadings[row], loadings[column], strict=True)
+            )
+            if row == column:
+                correlation[row, column] += residual_variance[row]
+    if not np.array_equal(correlation, correlation.T):
+        raise ValueError("constructed correlation matrix is not symmetric")
     return labels, correlation
 
 
+def build_cholesky_factor(correlation: np.ndarray) -> np.ndarray:
+    """Return a fixed-order lower Cholesky factor after validating reconstruction."""
+    if correlation.ndim != 2 or correlation.shape[0] != correlation.shape[1]:
+        raise ValueError("correlation matrix must be square")
+    if not np.array_equal(correlation, correlation.T):
+        raise ValueError("correlation matrix must be symmetric")
+    factor = np.zeros_like(correlation, dtype=np.float64)
+    for row in range(len(correlation)):
+        for column in range(row + 1):
+            subtotal = math.fsum(
+                float(factor[row, index]) * float(factor[column, index]) for index in range(column)
+            )
+            remainder = float(correlation[row, column]) - subtotal
+            if row == column:
+                if remainder <= 0.0:
+                    raise ValueError("correlation matrix must be positive definite")
+                factor[row, column] = math.sqrt(remainder)
+            else:
+                factor[row, column] = remainder / float(factor[column, column])
+    for row in range(len(correlation)):
+        for column in range(len(correlation)):
+            reconstructed = math.fsum(
+                float(factor[row, index]) * float(factor[column, index])
+                for index in range(min(row, column) + 1)
+            )
+            if not math.isclose(
+                reconstructed,
+                float(correlation[row, column]),
+                rel_tol=CORRELATION_TOLERANCE,
+                abs_tol=CORRELATION_TOLERANCE,
+            ):
+                raise ValueError("Cholesky factor does not reconstruct the correlation matrix")
+    return factor
+
+
 def _correlated_shocks(spec: FixtureSpec, observations: int) -> tuple[list[str], np.ndarray]:
+    if spec.generator_version != GENERATOR_VERSION:
+        raise ValueError(
+            f"unsupported fixture generator version: {spec.generator_version}; "
+            f"expected {GENERATOR_VERSION}"
+        )
     labels, correlation = build_correlation_matrix(spec)
-    eigenvalues, eigenvectors = np.linalg.eigh(correlation)
-    root = eigenvectors @ np.diag(np.sqrt(np.clip(eigenvalues, 0.0, None)))
+    root = build_cholesky_factor(correlation)
     random = np.random.default_rng(spec.seed).standard_normal((observations, len(labels)))
-    return labels, random @ root.T
+    shocks = np.empty_like(random)
+    for observation in range(observations):
+        for series in range(len(labels)):
+            shocks[observation, series] = math.fsum(
+                float(random[observation, factor]) * float(root[series, factor])
+                for factor in range(series + 1)
+            )
+    return labels, shocks
 
 
 def _geometric_path(
@@ -58,8 +116,10 @@ def _geometric_path(
     values[0] = initial_value
     daily_drift = (annual_return - 0.5 * annual_volatility**2) / trading_days
     daily_volatility = annual_volatility / math.sqrt(trading_days)
-    increments = daily_drift + daily_volatility * shocks[1:]
-    values[1:] = initial_value * np.exp(np.cumsum(increments))
+    current = initial_value
+    for index, shock in enumerate(shocks[1:], start=1):
+        current *= math.exp(daily_drift + daily_volatility * float(shock))
+        values[index] = current
     return values
 
 

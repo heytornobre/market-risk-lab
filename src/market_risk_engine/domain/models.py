@@ -129,6 +129,7 @@ class SyntheticFxSpec(StrictModel):
 
 class FixtureSpec(StrictModel):
     specification_version: str
+    generator_version: str
     seed: int = Field(ge=0)
     portfolio_id: str
     base_currency: Currency
@@ -142,7 +143,7 @@ class FixtureSpec(StrictModel):
     fx_series: list[SyntheticFxSpec]
     positions: list[Position]
 
-    @field_validator("specification_version", "portfolio_id")
+    @field_validator("specification_version", "generator_version", "portfolio_id")
     @classmethod
     def validate_required_text(cls, value: str) -> str:
         return _require_text(value)

@@ -35,6 +35,20 @@ from market_risk_engine.risk.portfolio import prepare_portfolio_data
 from market_risk_engine.risk.stress import load_scenario_set, run_scenarios
 from market_risk_engine.storage.sqlite import SQLiteRepository
 
+_LOCAL_PATH = re.compile(
+    r"(?:"
+    r"/(?:Users|home)/[^/\s:'\"]+(?:/[^\s:'\"]*)?"
+    r"|/(?:private/)?tmp(?:/[^\s:'\"]*)?"
+    r"|/private/var/folders(?:/[^\s:'\"]*)?"
+    r"|[A-Za-z]:\\(?:Users\\[^\\\s:'\"]+|Windows\\Temp|Temp)(?:\\[^\s:'\"]*)?"
+    r")"
+)
+
+
+def _redact_local_path(match: re.Match[str]) -> str:
+    basename = re.split(r"[/\\]", match.group(0))[-1]
+    return f"<local-path>/{basename}" if basename else "<local-path>"
+
 
 def _risk_record(
     *,
@@ -60,11 +74,7 @@ def _risk_record(
 
 def _safe_failure_reason(error: Exception) -> str:
     message = " ".join(str(error).split())
-    message = re.sub(
-        r"(?:/(?:Users|home)/[^/\s]+|/private/(?:tmp|var)/[^\s:]+)(?:/[^\s:]*)?",
-        "<local-path>",
-        message,
-    )
+    message = _LOCAL_PATH.sub(_redact_local_path, message)
     if not message:
         message = "calculation failed without an explanatory message"
     return f"{type(error).__name__}: {message}"[:500]
@@ -259,14 +269,11 @@ class CalculationService:
                 factor_metrics=factor_records,
             )
         except Exception as error:
+            safe_reason = _safe_failure_reason(error)
             try:
-                self.repository.transition_run(
-                    run_id, RunStatus.FAILED, failure_reason=_safe_failure_reason(error)
-                )
+                self.repository.transition_run(run_id, RunStatus.FAILED, failure_reason=safe_reason)
             except Exception as status_error:
                 raise MarketRiskLabError(
                     f"calculation failed and run status could not be recorded: {status_error}"
                 ) from error
-            if isinstance(error, MarketRiskLabError):
-                raise
-            raise MarketRiskLabError(_safe_failure_reason(error)) from error
+            raise MarketRiskLabError(safe_reason) from error

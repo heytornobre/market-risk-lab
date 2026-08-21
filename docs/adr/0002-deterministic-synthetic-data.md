@@ -12,6 +12,9 @@ approximating a real portfolio. Tests and screenshots also need stable expected 
 Generate fictional instruments, positions, prices, and FX rates from a versioned TOML
 specification and fixed seed. Fix ordering, precision, encoding, and line endings, and validate
 the generated bundle before loading it.
+Use the versioned `fixed-order-cholesky-v1` algorithm with explicitly ordered scalar
+covariance construction, factorization, shock multiplication, and path updates so
+numerical-library backend choices cannot change the seeded realisation.
 
 ## Consequences
 

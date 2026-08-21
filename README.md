@@ -72,16 +72,16 @@ model limitations.
 
 ## Representative deterministic results
 
-The default synthetic portfolio is valued at **€1,389,635** as of 2025-12-31. Under the
+The default synthetic portfolio is valued at **€816,546** as of 2025-12-31. Under the
 locked environment, representative 95% loss estimates are:
 
 | Model measure | 1 day | 10 days |
 |---|---:|---:|
-| Historical VaR | 0.96% | 2.92% |
-| Historical CVaR | 1.20% | 3.54% |
-| Parametric VaR | 0.95% | 2.76% |
-| Monte Carlo VaR | 0.95% | 2.66% |
-| Monte Carlo CVaR | 1.20% | 3.42% |
+| Historical VaR | 0.68% | 2.26% |
+| Historical CVaR | 0.87% | 2.70% |
+| Parametric VaR | 0.71% | 2.26% |
+| Monte Carlo VaR | 0.71% | 2.22% |
+| Monte Carlo CVaR | 0.88% | 2.78% |
 
 These values describe one deterministic fictional dataset. They are neither forecasts nor
 recommendations. Parametric CVaR is deliberately unavailable rather than represented as
@@ -99,7 +99,9 @@ run lifecycle, provenance model, and deferred scope.
 
 ## Engineering highlights
 
-- **Deterministic input pipeline:** fixed seed, ordering, precision, UTF-8, and LF output.
+- **Deterministic input pipeline:** a fixed seed and versioned fixed-order Cholesky
+  generator produce cross-platform byte-identical files with explicit ordering,
+  precision, UTF-8, and LF output.
 - **Historically correct FX treatment:** local prices are converted to EUR before returns
   and portfolio aggregation.
 - **Strict completeness:** missing series, ambiguous shocks, zero benchmark variance,
