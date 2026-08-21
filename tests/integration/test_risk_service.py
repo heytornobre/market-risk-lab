@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 
 from market_risk_engine.domain.models import RunStatus
-from market_risk_engine.exceptions import MarketRiskLabError, RepositoryError
+from market_risk_engine.exceptions import DataValidationError, MarketRiskLabError, RepositoryError
 from market_risk_engine.risk.models import CalculationRequest
 from market_risk_engine.risk.service import CalculationService
 from market_risk_engine.storage.migrations import MIGRATIONS
@@ -104,11 +104,35 @@ def test_persistence_failure_rolls_back_results_and_marks_failed(
 def test_missing_scenario_file_records_failed_run(tmp_path: Path, fixture_bundle: object) -> None:
     repository = _loaded_repository(tmp_path / "risk.db", fixture_bundle)
     service = CalculationService(repository, run_id_factory=lambda: "run-missing-scenario")
-    with pytest.raises(MarketRiskLabError):
+    with pytest.raises(MarketRiskLabError) as captured:
         service.run(_request(tmp_path / "missing.toml"))
     run = repository.inspect_calculation("run-missing-scenario")["run"]
     assert run["status"] == "failed"
     assert str(tmp_path) not in run["failure_reason"]
+    assert "DataValidationError" in run["failure_reason"]
+    assert "invalid stress scenario set <local-path>/missing.toml" in run["failure_reason"]
+    assert "No such file or directory" in run["failure_reason"]
+    assert str(tmp_path) not in str(captured.value)
+    assert "invalid stress scenario set <local-path>/missing.toml" in str(captured.value)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/" + "tmp" + "/ci-job/missing.toml",
+        "/private/" + "tmp" + "/ci-job/missing.toml",
+        "/" + "home" + "/runner/work/missing.toml",
+        "/" + "Users" + "/example/work/missing.toml",
+        "C:" + "\\Users" + "\\example\\work\\missing.toml",
+        "C:" + "\\Windows\\Temp\\ci-job\\missing.toml",
+    ],
+)
+def test_failure_reason_redacts_platform_local_paths(path: str) -> None:
+    from market_risk_engine.risk.service import _safe_failure_reason
+
+    reason = _safe_failure_reason(DataValidationError(f"could not read {path}: unavailable"))
+    assert path not in reason
+    assert reason == "DataValidationError: could not read <local-path>/missing.toml: unavailable"
 
 
 def test_risk_identity_allows_distinct_parameter_variants(

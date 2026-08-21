@@ -5,6 +5,21 @@ deterministic synthetic data. It is not a realised-performance backtest,
 production risk infrastructure, regulatory reporting, investment advice, or a
 claim that these models are suitable for any particular portfolio.
 
+## Synthetic input reproducibility
+
+Fixture specification `1.1.0` uses generator algorithm
+`fixed-order-cholesky-v1`. A fixed factor and series order constructs the intended
+correlation matrix with explicitly ordered scalar sums. A lower Cholesky factor is
+then calculated with fixed loop order and must reconstruct that matrix within
+relative and absolute tolerance `1e-12`. Applying the seeded PCG64 normal stream
+through this factor avoids platform-dependent eigenvector orientation while
+preserving the specified covariance model. Prices and FX rates are serialized with
+explicit UTF-8, LF newlines, row order, column order, and ten-decimal formatting.
+
+The seed fixes a synthetic realisation; it gives that realisation no forecasting or
+economic privilege. See [Synthetic data](synthetic-data.md) for the complete fixture
+boundary.
+
 ## EUR valuation and weights
 
 For instrument `i` and date `t`:

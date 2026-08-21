@@ -7,7 +7,13 @@ import pytest
 
 from market_risk_engine.data.fx import base_currency_prices
 from market_risk_engine.data.loaders import load_fixture_bundle, load_specification
-from market_risk_engine.data.synthetic import build_correlation_matrix, generate_fixtures
+from market_risk_engine.data.synthetic import (
+    CORRELATION_TOLERANCE,
+    GENERATOR_VERSION,
+    build_cholesky_factor,
+    build_correlation_matrix,
+    generate_fixtures,
+)
 from market_risk_engine.exceptions import DataValidationError
 
 
@@ -15,12 +21,35 @@ def _copy_fixture(source: Path, destination: Path) -> None:
     shutil.copytree(source, destination)
 
 
-def test_correlation_construction_is_psd(fixture_directory: Path) -> None:
+def test_correlation_construction_and_fixed_order_cholesky(fixture_directory: Path) -> None:
     spec = load_specification(fixture_directory / "fixture-spec.toml")
     labels, correlation = build_correlation_matrix(spec)
+    factor = build_cholesky_factor(correlation)
     assert len(labels) == 15
+    assert labels == [
+        *sorted(item.instrument_id for item in spec.instruments),
+        *(
+            f"FX_{item.quote_currency.value}"
+            for item in sorted(spec.fx_series, key=lambda item: item.quote_currency.value)
+        ),
+    ]
+    assert spec.generator_version == GENERATOR_VERSION
+    assert np.array_equal(correlation, correlation.T)
     assert np.allclose(np.diag(correlation), 1.0)
-    assert np.linalg.eigvalsh(correlation).min() >= -1e-12
+    assert np.all(np.diag(factor) > 0.0)
+    assert np.allclose(
+        factor @ factor.T,
+        correlation,
+        rtol=CORRELATION_TOLERANCE,
+        atol=CORRELATION_TOLERANCE,
+    )
+
+
+def test_cholesky_rejects_non_symmetric_and_non_positive_definite_matrices() -> None:
+    with pytest.raises(ValueError, match="symmetric"):
+        build_cholesky_factor(np.array([[1.0, 0.1], [0.2, 1.0]]))
+    with pytest.raises(ValueError, match="positive definite"):
+        build_cholesky_factor(np.array([[1.0, 2.0], [2.0, 1.0]]))
 
 
 def test_generation_is_byte_reproducible(fixture_directory: Path, tmp_path: Path) -> None:

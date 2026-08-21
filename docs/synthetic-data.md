@@ -18,14 +18,28 @@ matrix is constructed as:
 
 `L × Lᵀ + diagonal(1 − row_sum(L²))`
 
-This construction has a unit diagonal and is positive semidefinite when every
+This construction has a unit diagonal and is positive definite for the supplied
+independent residual variances when every
 row's squared loadings sum to less than one. The generator verifies that
-condition and checks the resulting eigenvalues.
+condition, exact symmetry, positive Cholesky pivots, deterministic series ordering,
+and reconstruction of the intended correlation matrix with relative and absolute
+tolerance `1e-12`.
 
 The generator sorts factors, instruments, FX series, dates, and output rows. It
-uses NumPy's seeded generator, fixed decimal formatting, UTF-8, and LF newlines.
-Under the locked dependency environment, repeated generation is byte-for-byte
-stable.
+uses generator algorithm `fixed-order-cholesky-v1`. Correlations, Cholesky entries,
+correlated shocks, and geometric paths use explicitly ordered scalar operations;
+this avoids BLAS/LAPACK-dependent eigenvector orientations and reduction order.
+The independent normal stream comes from NumPy's seeded default PCG64 generator.
+CSV output uses ten decimal places, UTF-8, LF newlines, fixed columns, and sorted
+rows. The algorithm identifier is part of the authoritative TOML specification;
+the specification hash and version are persisted when the fixture is loaded.
+Under the locked dependency environment, the same specification and seed generate
+byte-identical files on macOS and Linux.
+
+Specification `1.1.0` intentionally replaces the earlier eigendecomposition-based
+realisation. Both approaches represent the configured covariance structure, but
+eigenvector orientation is not portable across numerical-library backends. The
+fixed-order Cholesky mapping gives the seed an unambiguous cross-platform meaning.
 
 ## FX convention
 
